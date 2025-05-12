@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: pokedex-api
+    env: docker
+    plan: free
+    branch: main
+    region: oregon
