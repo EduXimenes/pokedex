@@ -2,10 +2,44 @@
 {
     public class Pokemon
     {
-        public int Id { get; set; }
-        public string? Name { get; set; }
-        public string? Sprite { get; set; }
-        public string? Cries { get; set; }
-        public List<string> Evolutions { get; set; } = new List<string>();
+        public int Id { get; private set; }
+        public string Name { get; private set; }
+        public string Sprite { get; private set; }
+        public string Cries { get; private set; }
+        public List<string> Evolutions { get; private set; }
+
+        private Pokemon() { }
+
+        public Pokemon(int id, string name, string sprite, string cries)
+        {
+            if (id <= 0)
+            {
+                throw new ArgumentException("Pokemon ID must be greater than 0", nameof(id));
+            }
+
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentException("Pokemon name cannot be empty", nameof(name));
+            }
+
+            Id = id;
+            Name = name;
+            Sprite = sprite;
+            Cries = cries;
+            Evolutions = new List<string>();
+        }
+
+        public void AddEvolution(string evolutionName)
+        {
+            if (string.IsNullOrWhiteSpace(evolutionName))
+            {
+                throw new ArgumentException("Evolution name cannot be empty", nameof(evolutionName));
+            }
+
+            if (!Evolutions.Contains(evolutionName))
+            {
+                Evolutions.Add(evolutionName);
+            }
+        }
     }
 }

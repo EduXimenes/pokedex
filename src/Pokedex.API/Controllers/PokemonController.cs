@@ -43,4 +43,25 @@ public class PokemonController : ControllerBase
             return NotFound(new { message = ex.Message });
         }
     }
+
+
+    /// <summary>
+    /// Retrieves basic data about a 10 random Pokémons.
+    /// </summary>
+    /// <returns>Basic Pokémon information including evolutions and sprite.</returns>
+    /// <response code="200">Returns the Pokémon data.</response>
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetRandom()
+    {
+        try
+        {
+            var pokemon = await _pokemonAppService.GetRandomAsync();
+            return Ok(pokemon);
+        }
+        catch (Exception ex)
+        {
+            return NotFound(new { message = ex.Message });
+        }
+    }
 }

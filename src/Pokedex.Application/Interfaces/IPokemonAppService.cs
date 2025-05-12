@@ -1,9 +1,10 @@
-﻿using Pokedex.Application.Dto;
+﻿using Pokedex.Domain.Entities;
 
 namespace Pokedex.Application.Interfaces
 {
     public interface IPokemonAppService
     {
-        Task<PokemonDto> GetByIdOrNameAsync(string idOrName);
+        Task<Pokemon> GetByIdOrNameAsync(string idOrName);
+        Task<List<Pokemon>> GetRandomAsync();
     }
 }
