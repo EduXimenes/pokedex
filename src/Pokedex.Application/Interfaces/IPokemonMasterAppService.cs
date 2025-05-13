@@ -8,6 +8,6 @@ namespace Pokedex.Application.Interfaces
         Task CapturePokemonAsync(CapturePokemonDto dto);
         Task<int> CreateMasterAsync(PokemonMasterDto dto);
         Task<List<CapturedPokemon>> GetCapturedPokemonsAsync(int masterId);
-        Task<PokemonMaster> GetMasterAsync(string masterName);
+        Task<PokemonMaster> GetMasterAsync(string masterIdOrName);
     }
 }

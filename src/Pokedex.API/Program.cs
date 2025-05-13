@@ -1,8 +1,12 @@
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Pokedex.Application.Interfaces;
 using Pokedex.Application.Mapping;
 using Pokedex.Application.Services;
-using Pokedex.Domain.Interfaces;
+using Pokedex.Application.Validators;
+using Pokedex.Domain.Dto;
 using Pokedex.Infrastructure.Data;
 using Pokedex.Infrastructure.ExternalServices;
 using System.Reflection;
@@ -12,6 +16,24 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
+builder.Services.AddFluentValidationAutoValidation()
+    .AddFluentValidationClientsideAdapters();
+builder.Services.AddValidatorsFromAssemblyContaining<PokemonMasterDtoValidator>();
+
+builder.Services.AddControllers()
+    .ConfigureApiBehaviorOptions(options =>
+    {
+        options.InvalidModelStateResponseFactory = actionContext =>
+        {
+            var errors = actionContext.ModelState
+                .Where(e => e.Value.Errors.Count > 0)
+                .SelectMany(e => e.Value.Errors)
+                .Select(e => e.ErrorMessage)
+                .ToList();
+
+            return new BadRequestObjectResult(ApiResponse<object>.Error(errors, "Validation failed"));
+        };
+    });
 builder.Services.AddMemoryCache();
 builder.Services.AddScoped<IPokemonAppService, PokemonAppService>();
 builder.Services.AddScoped<IPokemonApiClient, PokemonApiClient>();
@@ -31,11 +53,8 @@ builder.Services.AddDbContext<PokedexDbContext>(options =>
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 app.MapControllers();

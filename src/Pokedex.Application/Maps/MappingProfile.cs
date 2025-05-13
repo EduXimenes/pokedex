@@ -9,7 +9,6 @@ namespace Pokedex.Application.Mapping
         public MappingProfile()
         {
             CreateMap<Pokemon, PokemonDto>().ReverseMap();
-
         }
     }
 }
