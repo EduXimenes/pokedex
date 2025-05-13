@@ -16,7 +16,7 @@ public class PokemonMasterAppService : IPokemonMasterAppService
 
     public async Task<int> CreateMasterAsync(PokemonMasterDto dto)
     {
-        var master = new PokemonMaster(dto.Name, dto.Email);
+        var master = new PokemonMaster(dto.Name, dto.Email, dto.Document, dto.Age);
 
         _context.PokemonMasters.Add(master);
         await _context.SaveChangesAsync();
@@ -42,17 +42,26 @@ public class PokemonMasterAppService : IPokemonMasterAppService
             .Where(p => p.PokemonMasterId == masterId)
             .ToListAsync();
     }
-    public async Task<PokemonMaster> GetMasterAsync(string masterName)
+    public async Task<PokemonMaster> GetMasterAsync(string masterIdOrName)
     {
-        var response = await _context.PokemonMasters
-            .Where(p => p.Name == masterName)
-            .FirstOrDefaultAsync();
+        PokemonMaster? response;
+
+        if (int.TryParse(masterIdOrName, out int id))
+        {
+            response = await _context.PokemonMasters
+                .FirstOrDefaultAsync(p => p.Id == id);
+        }
+        else
+        {
+            response = await _context.PokemonMasters
+                .FirstOrDefaultAsync(p => p.Name.ToLower() == masterIdOrName.ToLower());
+        }
+
         if (response == null)
         {
             throw new Exception("Pokemon Master not Found");
         }
+
         return response;
     }
-
-
 }

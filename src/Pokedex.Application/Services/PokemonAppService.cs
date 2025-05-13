@@ -119,19 +119,19 @@ public class PokemonAppService : IPokemonAppService
     {
         return data.GetProperty("sprites")
             .GetProperty("front_default")
-            .GetString();
+            .GetString()!;
     }
     private string GetSpeciesUrl(JsonElement data)
     {
         return data.GetProperty("species")
             .GetProperty("url")
-            .GetString();
+            .GetString()!;
     }
     private string GetEvolutionUrl(JsonElement data)
     {
         return data.GetProperty("evolution_chain")
             .GetProperty("url")
-            .GetString();
+            .GetString()!;
     }
     private async Task<string?> GetSpriteBase64WithRetry(string? spriteUrl)
     {
