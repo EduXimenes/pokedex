@@ -7,7 +7,7 @@
         public string Sprite { get; private set; }
         public string SpriteBase64 { get; private set; }
         public string Cries { get; private set; }
-        public List<string> Evolutions { get; private set; }
+        public List<Pokemon> Evolutions { get; private set; }
 
         private Pokemon() { }
 
@@ -28,20 +28,7 @@
             Sprite = sprite;
             Cries = cries;
             SpriteBase64 = spriteBase64;
-            Evolutions = new List<string>();
-        }
-
-        public void AddEvolution(string evolutionName)
-        {
-            if (string.IsNullOrWhiteSpace(evolutionName))
-            {
-                throw new ArgumentException("Evolution name cannot be empty", nameof(evolutionName));
-            }
-
-            if (!Evolutions.Contains(evolutionName))
-            {
-                Evolutions.Add(evolutionName);
-            }
+            Evolutions = new List<Pokemon>();
         }
     }
 }
