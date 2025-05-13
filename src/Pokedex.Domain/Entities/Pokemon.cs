@@ -5,12 +5,13 @@
         public int Id { get; private set; }
         public string Name { get; private set; }
         public string Sprite { get; private set; }
+        public string SpriteBase64 { get; private set; }
         public string Cries { get; private set; }
         public List<string> Evolutions { get; private set; }
 
         private Pokemon() { }
 
-        public Pokemon(int id, string name, string sprite, string cries)
+        public Pokemon(int id, string name, string sprite, string cries, string spriteBase64 = null)
         {
             if (id <= 0)
             {
@@ -26,6 +27,7 @@
             Name = name;
             Sprite = sprite;
             Cries = cries;
+            SpriteBase64 = spriteBase64;
             Evolutions = new List<string>();
         }
 
