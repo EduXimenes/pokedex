@@ -1,4 +1,6 @@
-﻿namespace Pokedex.Domain.Dto
+﻿using Pokedex.Domain.Entities;
+
+namespace Pokedex.Domain.Dto
 {
     public class PokemonDto
     {
@@ -7,6 +9,6 @@
         public string? Sprite { get; set; }
         public string? SpriteBase64 { get; set; }
         public string? Cries { get; set; }
-        public List<string> Evolutions { get; set; } = new List<string>();
+        public List<Pokemon>? Evolutions { get; set; } = new List<Pokemon>();
     }
 }

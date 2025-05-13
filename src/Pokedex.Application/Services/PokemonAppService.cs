@@ -23,12 +23,9 @@ public class PokemonAppService : IPokemonAppService
     #region Public Methods
     public async Task<Pokemon> GetByIdOrNameAsync(string idOrName)
     {
-        var data = await GetByIdAsync(idOrName);
-        var pokemon = _mapper.Map<Pokemon>(data);
-
+        var pokemon = await GetByIdAsync(idOrName);
         return pokemon;
     }
-
     public async Task<List<Pokemon>> GetRandomAsync()
     {
         var rand = new Random();
@@ -56,20 +53,49 @@ public class PokemonAppService : IPokemonAppService
     #endregion
 
     #region Private Methods
-    private async Task<string> GetSpriteBase64Async(string spriteUrl)
+    private async Task<List<Pokemon>> GetEvolutionsAsync(JsonElement data, string speciesUrl)
     {
-        try
+        var evolutionChain = new List<string>();
+
+        var speciesData = await _pokemonApiClient.GetSpeciesDataAsync(speciesUrl);
+        var evolutionUrl = GetEvolutionUrl(speciesData);
+        var evolutionData = await _pokemonApiClient.GetEvolutionChainDataAsync(evolutionUrl);
+
+        var chain = evolutionData.GetProperty("chain");
+        var name = data.GetProperty("name").ToString();
+
+        GetEvolutions(chain, evolutionChain, name);
+
+        var evolvedPokemons = new List<Pokemon>();
+        await GetDataEvolvedPokemons(evolutionChain, evolvedPokemons);
+
+        return evolvedPokemons;
+    }
+    private async Task GetDataEvolvedPokemons(List<string> evolutionChain, List<Pokemon> evolvedPokemons)
+    {
+        foreach (var evoName in evolutionChain)
         {
-            var imageBytes = await _httpClient.GetByteArrayAsync(spriteUrl);
-            return Convert.ToBase64String(imageBytes);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Erro ao converter sprite para base64: {ex.Message}");
-            return null;
+            var evoData = await _pokemonApiClient.GetPokemonDataAsync(evoName);
+            var spriteUrl = GetSpriteUrl(evoData);
+            var spriteBase64 = await GetSpriteBase64WithRetry(spriteUrl);
+            var dto = CreatePokemonDto(evoData, spriteUrl, spriteBase64);
+            evolvedPokemons.Add(_mapper.Map<Pokemon>(dto));
         }
     }
+    private void GetEvolutions(JsonElement node, List<string> result, string pokemonName)
+    {
+        var speciesName = node.GetProperty("species").GetProperty("name").GetString();
 
+        if (speciesName != pokemonName && !string.IsNullOrEmpty(speciesName))
+        {
+            result.Add(speciesName);
+        }
+
+        foreach (var evolution in node.GetProperty("evolves_to").EnumerateArray())
+        {
+            GetEvolutions(evolution, result, pokemonName);
+        }
+    }
     private async Task<Pokemon> GetByIdAsync(string id)
     {
         try
@@ -77,8 +103,10 @@ public class PokemonAppService : IPokemonAppService
             var data = await _pokemonApiClient.GetPokemonDataAsync(id);
             var spriteUrl = GetSpriteUrl(data);
             var spriteBase64 = await GetSpriteBase64WithRetry(spriteUrl);
+            var species = GetSpeciesUrl(data);
+            var evolutions = await GetEvolutionsAsync(data, species);
 
-            var dto = CreatePokemonDto(data, spriteUrl, spriteBase64);
+            var dto = CreatePokemonDto(data, spriteUrl, spriteBase64, evolutions);
             return _mapper.Map<Pokemon>(dto);
         }
         catch (Exception ex)
@@ -87,14 +115,24 @@ public class PokemonAppService : IPokemonAppService
             throw;
         }
     }
-
     private string GetSpriteUrl(JsonElement data)
     {
         return data.GetProperty("sprites")
             .GetProperty("front_default")
             .GetString();
     }
-
+    private string GetSpeciesUrl(JsonElement data)
+    {
+        return data.GetProperty("species")
+            .GetProperty("url")
+            .GetString();
+    }
+    private string GetEvolutionUrl(JsonElement data)
+    {
+        return data.GetProperty("evolution_chain")
+            .GetProperty("url")
+            .GetString();
+    }
     private async Task<string?> GetSpriteBase64WithRetry(string? spriteUrl)
     {
         if (string.IsNullOrEmpty(spriteUrl))
@@ -112,8 +150,20 @@ public class PokemonAppService : IPokemonAppService
 
         return spriteBase64;
     }
-
-    private PokemonDto CreatePokemonDto(JsonElement data, string spriteUrl, string? spriteBase64)
+    private async Task<string> GetSpriteBase64Async(string spriteUrl)
+    {
+        try
+        {
+            var imageBytes = await _httpClient.GetByteArrayAsync(spriteUrl);
+            return Convert.ToBase64String(imageBytes);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Erro ao converter sprite para base64: {ex.Message}");
+            return null;
+        }
+    }
+    private PokemonDto CreatePokemonDto(JsonElement data, string spriteUrl, string? spriteBase64, List<Pokemon>? evolutions = null)
     {
         return new PokemonDto
         {
@@ -121,7 +171,8 @@ public class PokemonAppService : IPokemonAppService
             Name = data.GetProperty("name").GetString()!,
             Sprite = spriteUrl,
             Cries = data.GetProperty("cries").GetProperty("latest").GetString(),
-            SpriteBase64 = spriteBase64
+            SpriteBase64 = spriteBase64,
+            Evolutions = evolutions ?? new List<Pokemon>()
         };
     }
     #endregion
