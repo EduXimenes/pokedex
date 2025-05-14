@@ -44,7 +44,6 @@ O projeto está estruturado utilizando Arquitetura Limpa, respeitando princípio
 
 - [.NET 8 SDK](https://dotnet.microsoft.com/download)
 - [Git](https://git-scm.com/)
-- [Docker](https://www.docker.com/) (opcional)
 
 ### Clonando o Repositório
 
@@ -56,12 +55,6 @@ cd pokedex
 ```bash
 cd src/Pokedex.API
 dotnet run
-```
-
-### Executando com Docker
-```bash
-docker build -t pokedex-api .
-docker run -p 5000:80 pokedex-api
 ```
 
 ### Testando a API
