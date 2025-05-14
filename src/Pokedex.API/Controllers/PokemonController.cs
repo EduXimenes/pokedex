@@ -20,13 +20,13 @@ public class PokemonController : ControllerBase
     }
 
     /// <summary>
-    /// Retrieves basic data about a Pokémon by ID or name.
+    /// Retrieves basic data about a Pokemon by ID or name.
     /// </summary>
-    /// <param name="idOrName">The Pokémon ID (1, 2, 3...) or name (bulbasaur, charizard, dragonite...).</param>
-    /// <returns>Basic Pokémon information including evolutions and sprite.</returns>
-    /// <response code="200">Returns the Pokémon data.</response>
+    /// <param name="idOrName">The Pokemon ID (1, 2, 3...) or name (bulbasaur, charizard, dragonite...).</param>
+    /// <returns>Basic Pokemon information including evolutions and sprite.</returns>
+    /// <response code="200">Returns the Pokemon data.</response>
     /// <response code="400">If the idOrName is null or empty.</response>
-    /// <response code="404">If the Pokémon is not found.</response>
+    /// <response code="404">If the Pokemon is not found.</response>
     [HttpGet("{idOrName}")]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
@@ -36,26 +36,24 @@ public class PokemonController : ControllerBase
         if (string.IsNullOrWhiteSpace(idOrName))
         {
             return BadRequest(ApiResponse<object>.Error(
-                new List<string> { "The Pokémon name or ID must be provided." },
-                "Invalid request"));
+                new List<string> { "The Pokemon name or ID must be provided." }, "Invalid request"));
         }
 
         try
         {
             var pokemon = await _pokemonAppService.GetByIdOrNameAsync(idOrName);
             var viewModel = _mapper.Map<PokemonViewModel>(pokemon);
-            return Ok(ApiResponse<object>.Ok(viewModel, "Pokémon retrieved successfully"));
+            return Ok(ApiResponse<object>.Ok(viewModel, "Pokemon retrieved successfully"));
         }
         catch (Exception ex)
         {
             return NotFound(ApiResponse<object>.Error(
-                new List<string> { ex.Message },
-                "Pokémon not found"));
+                new List<string> { ex.Message }, "Pokemon not found"));
         }
     }
 
     /// <summary>
-    /// Retrieves basic data about a 10 random Pokémons.
+    /// Retrieves basic data about a 10 random Pokemons.
     /// </summary>
     /// <returns>A list of 10 random Pokemon with their details.</returns>
     /// <response code="200">Returns the list of random Pokemon.</response>
@@ -68,13 +66,12 @@ public class PokemonController : ControllerBase
         {
             var pokemons = await _pokemonAppService.GetRandomAsync();
             var viewModels = _mapper.Map<List<PokemonViewModel>>(pokemons);
-            return Ok(ApiResponse<object>.Ok(viewModels, "Random Pokémon retrieved successfully"));
+            return Ok(ApiResponse<object>.Ok(viewModels, "Random Pokemons retrieved successfully"));
         }
         catch (Exception ex)
         {
             return BadRequest(ApiResponse<object>.Error(
-                new List<string> { ex.Message },
-                "Failed to retrieve random Pokémon"));
+                new List<string> { ex.Message }, "Failed to retrieve random Pokemons"));
         }
     }
 }

@@ -7,7 +7,6 @@ using Pokedex.Application.Mapping;
 using Pokedex.Application.Services;
 using Pokedex.Application.Validators;
 using Pokedex.Domain.Dto;
-using Pokedex.Domain.Interfaces;
 using Pokedex.Infrastructure.Data;
 using Pokedex.Infrastructure.ExternalServices;
 using System.Reflection;
@@ -15,28 +14,33 @@ using Pokedex.API.Mapping;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    serverOptions.ListenLocalhost(5000);
+});
+
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-builder.Services.AddControllers();
-builder.Services.AddFluentValidationAutoValidation()
-    .AddFluentValidationClientsideAdapters();
-builder.Services.AddValidatorsFromAssemblyContaining<PokemonMasterDtoValidator>();
-
 builder.Services.AddControllers()
-    .ConfigureApiBehaviorOptions(options =>
+    .AddFluentValidation(fv => 
     {
-        options.InvalidModelStateResponseFactory = actionContext =>
-        {
-            var errors = actionContext.ModelState
-                .Where(e => e.Value.Errors.Count > 0)
-                .SelectMany(e => e.Value.Errors)
-                .Select(e => e.ErrorMessage)
-                .ToList();
-
-            return new BadRequestObjectResult(ApiResponse<object>.Error(errors, "Validation failed"));
-        };
+        fv.RegisterValidatorsFromAssemblyContaining<CreatePokemonMasterViewModelValidator>();
+        fv.AutomaticValidationEnabled = true;
     });
-builder.Services.AddMemoryCache();
+
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.InvalidModelStateResponseFactory = actionContext =>
+    {
+        var errors = actionContext.ModelState
+            .Where(e => e.Value.Errors.Count > 0)
+            .SelectMany(e => e.Value.Errors)
+            .Select(e => e.ErrorMessage)
+            .ToList();
+
+        return new BadRequestObjectResult(ApiResponse<object>.Error(errors, "Validation failed"));
+    };
+});
+
 builder.Services.AddScoped<IPokemonAppService, PokemonAppService>();
 builder.Services.AddScoped<IPokemonApiClient, PokemonApiClient>();
 builder.Services.AddScoped<IPokemonMasterAppService, PokemonMasterAppService>();
@@ -47,6 +51,12 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly, typeof(ViewModelMappingProfile).Assembly);
 builder.Services.AddSwaggerGen(options =>
 {
+    options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+    {
+        Title = "Pokédex API",
+        Version = "v1",
+        Description = "API for managing Pokémon and Pokémon Masters"
+    });
     var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
 });
@@ -56,8 +66,12 @@ builder.Services.AddDbContext<PokedexDbContext>(options =>
 var app = builder.Build();
 
 app.UseSwagger();
-app.UseSwaggerUI();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Pokédex API V1");
+    c.RoutePrefix = "swagger";
+});
 
-app.UseHttpsRedirection();
+app.UseAuthorization();
 app.MapControllers();
 app.Run();

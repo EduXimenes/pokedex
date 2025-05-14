@@ -90,11 +90,11 @@ public class PokemonMasterController : ControllerBase
         {
             var dto = _mapper.Map<CapturePokemonDto>(viewModel);
             await _pokemonMasterAppService.CapturePokemonAsync(dto);
-            return Ok(ApiResponse<object>.Ok(null, "Pokémon captured successfully!"));
+            return Ok(ApiResponse<object>.Ok(null, "Pokemon captured successfully!"));
         }
         catch (Exception ex)
         {
-            return BadRequest(ApiResponse<object>.Error(new List<string> { ex.Message }, "Failed to capture Pokémon"));
+            return BadRequest(ApiResponse<object>.Error(new List<string> { ex.Message }, "Failed to capture Pokemon"));
         }
     }
 
@@ -114,11 +114,11 @@ public class PokemonMasterController : ControllerBase
         {
             var pokemons = await _pokemonMasterAppService.GetCapturedPokemonsAsync(masterId);
             var viewModels = _mapper.Map<List<CapturedPokemonViewModel>>(pokemons);
-            return Ok(ApiResponse<object>.Ok(viewModels, "Captured Pokémon retrieved successfully"));
+            return Ok(ApiResponse<object>.Ok(viewModels, "Captured Pokemon retrieved successfully"));
         }
         catch (Exception ex)
         {
-            return NotFound(ApiResponse<object>.Error(new List<string> { ex.Message }, "Failed to retrieve captured Pokémon"));
+            return NotFound(ApiResponse<object>.Error(new List<string> { ex.Message }, "Failed to retrieve captured Pokemon"));
         }
     }
 }
