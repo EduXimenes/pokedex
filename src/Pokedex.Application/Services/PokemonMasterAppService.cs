@@ -17,23 +17,23 @@ public class PokemonMasterAppService : IPokemonMasterAppService
         _context = context;
     }
 
-    public async Task<int> CreateMasterAsync(PokemonMasterDto dto)
+    public async Task<int> CreateMasterAsync(PokemonMasterDto pokemonMaster)
     {
-        var master = new PokemonMaster(dto.Name, dto.Email, dto.Document, dto.Age);
+        var master = new PokemonMaster(pokemonMaster.Name, pokemonMaster.Email, pokemonMaster.Document, pokemonMaster.Age);
 
         _context.PokemonMasters.Add(master);
         await _context.SaveChangesAsync();
         return master.Id;
     }
 
-    public async Task CapturePokemonAsync(CapturePokemonDto dto)
+    public async Task CapturePokemonAsync(CapturePokemonDto capturedPokemon)
     {
-        var pokemonData = await _pokemonApiClient.GetPokemonDataAsync(dto.PokemonId.ToString());
+        var pokemonData = await _pokemonApiClient.GetPokemonDataAsync(capturedPokemon.PokemonId.ToString());
 
         var capture = new CapturedPokemon
         {
-            PokemonId = dto.PokemonId,
-            PokemonMasterId = dto.MasterId,
+            PokemonId = capturedPokemon.PokemonId,
+            PokemonMasterId = capturedPokemon.MasterId,
             Name = pokemonData.GetProperty("name").GetString()!,
             Sprite = pokemonData.GetProperty("sprites").GetProperty("front_default").GetString()!
         };
@@ -47,6 +47,7 @@ public class PokemonMasterAppService : IPokemonMasterAppService
             .Where(p => p.PokemonMasterId == masterId)
             .ToListAsync();
     }
+
     public async Task<PokemonMaster> GetMasterAsync(string masterIdOrName)
     {
         PokemonMaster? response;

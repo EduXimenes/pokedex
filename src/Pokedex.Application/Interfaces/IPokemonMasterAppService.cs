@@ -5,8 +5,8 @@ namespace Pokedex.Application.Interfaces
 {
     public interface IPokemonMasterAppService
     {
-        Task CapturePokemonAsync(CapturePokemonDto dto);
-        Task<int> CreateMasterAsync(PokemonMasterDto dto);
+        Task CapturePokemonAsync(CapturePokemonDto capturedPokemon);
+        Task<int> CreateMasterAsync(PokemonMasterDto pokemonMaster);
         Task<List<CapturedPokemon>> GetCapturedPokemonsAsync(int masterId);
         Task<PokemonMaster> GetMasterAsync(string masterIdOrName);
     }
