@@ -3,14 +3,17 @@ using Pokedex.Application.Interfaces;
 using Pokedex.Domain.Dto;
 using Pokedex.Domain.Entities;
 using Pokedex.Infrastructure.Data;
+using Pokedex.Infrastructure.ExternalServices;
 
 namespace Pokedex.Application.Services;
 public class PokemonMasterAppService : IPokemonMasterAppService
 {
     private readonly PokedexDbContext _context;
+    private readonly IPokemonApiClient _pokemonApiClient;
 
-    public PokemonMasterAppService(PokedexDbContext context)
+    public PokemonMasterAppService(PokedexDbContext context, IPokemonApiClient pokemonApiClient)
     {
+        _pokemonApiClient = pokemonApiClient;
         _context = context;
     }
 
@@ -25,12 +28,14 @@ public class PokemonMasterAppService : IPokemonMasterAppService
 
     public async Task CapturePokemonAsync(CapturePokemonDto dto)
     {
+        var pokemonData = await _pokemonApiClient.GetPokemonDataAsync(dto.PokemonId.ToString());
+
         var capture = new CapturedPokemon
         {
             PokemonId = dto.PokemonId,
-            Name = dto.Name,
-            Sprite = dto.Sprite,
-            PokemonMasterId = dto.MasterId
+            PokemonMasterId = dto.MasterId,
+            Name = pokemonData.GetProperty("name").GetString()!,
+            Sprite = pokemonData.GetProperty("sprites").GetProperty("front_default").GetString()!
         };
         _context.CapturedPokemons.Add(capture);
         await _context.SaveChangesAsync();

@@ -7,9 +7,11 @@ using Pokedex.Application.Mapping;
 using Pokedex.Application.Services;
 using Pokedex.Application.Validators;
 using Pokedex.Domain.Dto;
+using Pokedex.Domain.Interfaces;
 using Pokedex.Infrastructure.Data;
 using Pokedex.Infrastructure.ExternalServices;
 using System.Reflection;
+using Pokedex.API.Mapping;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,7 +44,7 @@ builder.Services.AddScoped<PokedexDbContext>();
 builder.Services.AddHttpClient();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
+builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly, typeof(ViewModelMappingProfile).Assembly);
 builder.Services.AddSwaggerGen(options =>
 {
     var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";

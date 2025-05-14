@@ -1,29 +1,33 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Pokedex.Application.Interfaces;
 using Pokedex.Domain.Dto;
+using Pokedex.Application.ViewModels;
+using AutoMapper;
 
 [ApiController]
 [Route("api/[controller]")]
 public class PokemonMasterController : ControllerBase
 {
     private readonly IPokemonMasterAppService _pokemonMasterAppService;
+    private readonly IMapper _mapper;
 
-    public PokemonMasterController(IPokemonMasterAppService pokemonMasterAppService)
+    public PokemonMasterController(IPokemonMasterAppService pokemonMasterAppService, IMapper mapper)
     {
         _pokemonMasterAppService = pokemonMasterAppService;
+        _mapper = mapper;
     }
 
     /// <summary>
     /// Creates a new Pokemon Master.
     /// </summary>
-    /// <param name="dto">The Pokemon Master data including name, email, document, and age.</param>
+    /// <param name="viewModel">The Pokemon Master data including name, email, document, and age.</param>
     /// <returns>The ID of the created Pokemon Master.</returns>
     /// <response code="200">Returns the newly created Pokemon Master ID.</response>
     /// <response code="400">If the input data is invalid or creation fails.</response>
     [HttpPost("create")]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> CreateMaster([FromBody] PokemonMasterDto dto)
+    public async Task<IActionResult> CreateMaster([FromBody] CreatePokemonMasterViewModel viewModel)
     {
         if (!ModelState.IsValid)
         {
@@ -36,6 +40,7 @@ public class PokemonMasterController : ControllerBase
 
         try
         {
+            var dto = _mapper.Map<PokemonMasterDto>(viewModel);
             var id = await _pokemonMasterAppService.CreateMasterAsync(dto);
             return Ok(ApiResponse<object>.Ok(new { MasterId = id }, "Pokemon Master created successfully"));
         }
@@ -60,7 +65,8 @@ public class PokemonMasterController : ControllerBase
         try
         {
             var master = await _pokemonMasterAppService.GetMasterAsync(masterIdOrName);
-            return Ok(ApiResponse<object>.Ok(master, "Pokemon Master retrieved successfully"));
+            var viewModel = _mapper.Map<PokemonMasterViewModel>(master);
+            return Ok(ApiResponse<object>.Ok(viewModel, "Pokemon Master retrieved successfully"));
         }
         catch (Exception ex)
         {
@@ -71,17 +77,18 @@ public class PokemonMasterController : ControllerBase
     /// <summary>
     /// Captures a Pokemon for a Pokemon Master.
     /// </summary>
-    /// <param name="dto">The capture data including Pokemon ID, name, sprite, and Master ID.</param>
+    /// <param name="viewModel">The capture data including Pokemon ID, name, sprite, and Master ID.</param>
     /// <returns>A success message indicating the Pokemon was captured.</returns>
     /// <response code="200">Returns a success message.</response>
     /// <response code="400">If the capture operation fails.</response>
     [HttpPost("capture")]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> CapturePokemon([FromBody] CapturePokemonDto dto)
+    public async Task<IActionResult> CapturePokemon([FromBody] CapturePokemonViewModel viewModel)
     {
         try
         {
+            var dto = _mapper.Map<CapturePokemonDto>(viewModel);
             await _pokemonMasterAppService.CapturePokemonAsync(dto);
             return Ok(ApiResponse<object>.Ok(null, "Pokémon captured successfully!"));
         }
@@ -106,7 +113,8 @@ public class PokemonMasterController : ControllerBase
         try
         {
             var pokemons = await _pokemonMasterAppService.GetCapturedPokemonsAsync(masterId);
-            return Ok(ApiResponse<object>.Ok(pokemons, "Captured Pokémon retrieved successfully"));
+            var viewModels = _mapper.Map<List<CapturedPokemonViewModel>>(pokemons);
+            return Ok(ApiResponse<object>.Ok(viewModels, "Captured Pokémon retrieved successfully"));
         }
         catch (Exception ex)
         {

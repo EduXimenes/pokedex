@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Pokedex.Application.Interfaces;
 using Pokedex.Domain.Dto;
+using Pokedex.Application.ViewModels;
+using AutoMapper;
 
 namespace Pokedex.API.Controllers;
 
@@ -9,10 +11,12 @@ namespace Pokedex.API.Controllers;
 public class PokemonController : ControllerBase
 {
     private readonly IPokemonAppService _pokemonAppService;
+    private readonly IMapper _mapper;
 
-    public PokemonController(IPokemonAppService pokemonAppService)
+    public PokemonController(IPokemonAppService pokemonAppService, IMapper mapper)
     {
         _pokemonAppService = pokemonAppService;
+        _mapper = mapper;
     }
 
     /// <summary>
@@ -39,7 +43,8 @@ public class PokemonController : ControllerBase
         try
         {
             var pokemon = await _pokemonAppService.GetByIdOrNameAsync(idOrName);
-            return Ok(ApiResponse<object>.Ok(pokemon, "Pokémon retrieved successfully"));
+            var viewModel = _mapper.Map<PokemonViewModel>(pokemon);
+            return Ok(ApiResponse<object>.Ok(viewModel, "Pokémon retrieved successfully"));
         }
         catch (Exception ex)
         {
@@ -62,7 +67,8 @@ public class PokemonController : ControllerBase
         try
         {
             var pokemons = await _pokemonAppService.GetRandomAsync();
-            return Ok(ApiResponse<object>.Ok(pokemons, "Random Pokémon retrieved successfully"));
+            var viewModels = _mapper.Map<List<PokemonViewModel>>(pokemons);
+            return Ok(ApiResponse<object>.Ok(viewModels, "Random Pokémon retrieved successfully"));
         }
         catch (Exception ex)
         {
