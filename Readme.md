@@ -50,7 +50,7 @@ O projeto está estruturado utilizando Arquitetura Limpa, respeitando princípio
 
 ```bash
 git clone https://github.com/EduXimenes/pokedex.git
-cd pokedex-api
+cd pokedex
 ```
 ### Executando com .NET CLI
 ```bash
@@ -65,7 +65,7 @@ docker run -p 5000:80 pokedex-api
 ```
 
 ### Testando a API
-http://localhost:5000/swagger/index.html \
+http://localhost:5000/swagger \
 Ou o projeto publicado em Rennder\
 https://pokedex-6056.onrender.com/
 

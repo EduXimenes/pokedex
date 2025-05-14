@@ -45,7 +45,7 @@ public class PokemonAppService : IPokemonAppService
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Erro ao buscar Pokemon com Id {ids.Last()}: {ex.Message}");
+                Console.WriteLine($"Error fetch Pokemon with Id {ids.Last()}: {ex.Message}");
             }
         }
         return pokemons;
@@ -111,7 +111,7 @@ public class PokemonAppService : IPokemonAppService
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Erro ao obter dados do Pokémon: {ex.Message}");
+            Console.WriteLine($"Error fetching Pokemon data: {ex.Message}");
             throw;
         }
     }
@@ -159,7 +159,7 @@ public class PokemonAppService : IPokemonAppService
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Erro ao converter sprite para base64: {ex.Message}");
+            Console.WriteLine($"Error converting to base64: {ex.Message}");
             return null;
         }
     }

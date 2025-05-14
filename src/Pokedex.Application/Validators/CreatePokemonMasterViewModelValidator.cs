@@ -1,11 +1,11 @@
 using FluentValidation;
-using Pokedex.Domain.Dto;
+using Pokedex.Application.ViewModels;
 
 namespace Pokedex.Application.Validators
 {
-    public class PokemonMasterDtoValidator : AbstractValidator<PokemonMasterDto>
+    public class CreatePokemonMasterViewModelValidator : AbstractValidator<CreatePokemonMasterViewModel>
     {
-        public PokemonMasterDtoValidator()
+        public CreatePokemonMasterViewModelValidator()
         {
             RuleFor(x => x.Name)
                 .NotEmpty().WithMessage("Name is required")
