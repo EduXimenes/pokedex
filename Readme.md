@@ -1,57 +1,77 @@
 # Pokedex API
 
-Uma API RESTful desenvolvida com ASP.NET Core para consultar informações detalhadas sobre Pokémon, incluindo dados básicos, sprites em Base64, sons e cadeia de evolução. Ideal para consumo por frontends modernos.
+Uma API RESTful desenvolvida com ASP.NET Core para consultar informações detalhadas sobre Pokémon, como dados básicos, sprites, sons e cadeia de evolução.
+O projeto está estruturado utilizando Arquitetura Limpa, respeitando princípios SOLID e abordagem DDD.
 
-## 🚀 Tecnologias e Ferramentas Utilizadas
+## Tecnologias e Ferramentas Utilizadas
 
-- **Linguagem:** C#
-- **Framework:** ASP.NET Core 8
-- **ORM:** Entity Framework Core
-- **Banco de Dados:** SQLite
-- **HTTP Client:** System.Net.Http
-- **AutoMapper:** Mapeamento entre DTOs e Entidades
-- **Swagger:** Documentação interativa da API
-- **Docker:** Containerização da aplicação
-- **Render:** Deploy gratuito da API
+- C# / .NET 8
+- ASP.NET Core Web API
+- Entity Framework Core
+- SQLite
+- AutoMapper
+- MediatR
+- FluentValidation
+- Swagger
+- Docker
+- Fluent Validation
+- XUnit
+- Rennder
 
+### Funcionalidades
 
-### 🧪 Funcionalidades
-Buscar Pokémon por ID ou nome
+-  **Buscar Pokémon por ID ou nome**  
+  `GET /api/Pokemon/{idOrName}`  
 
-Obter 10 Pokémon aleatórios
+-  **Obter 10 Pokémons aleatórios**  
+  `GET /api/Pokemon/random`  
 
-Buscar dados de evolução de Pokémon
+-  **Criar um Pokémon Master (treinador)**  
+  `POST /api/PokemonMaster/create`  
 
-Obter sprites em URL e Base64
+-  **Buscar Pokémon Master por nome ou ID**  
+  `GET /api/PokemonMaster/{masterIdOrName}`  
 
-Gerenciar Pokémon Masters
+-  **Capturar Pokémons**  
+  `POST /api/PokemonMaster/capture`  
 
-## 📦 Como Instalar e Executar o Projeto
+-  **Listar Pokémons capturados**  
+  `GET /api/PokemonMaster/{masterId}/captured`  
 
-### ✅ Pré-requisitos
+## Como Instalar e Executar o Projeto
+
+### Pré-requisitos
 
 - [.NET 8 SDK](https://dotnet.microsoft.com/download)
 - [Git](https://git-scm.com/)
 - [Docker](https://www.docker.com/) (opcional)
 
-### 🔁 Clonando o Repositório
+### Clonando o Repositório
 
 ```bash
-git clone https://github.com/seu-usuario/pokedex-api.git
+git clone https://github.com/EduXimenes/pokedex.git
 cd pokedex-api
-
+```
 ### Executando com .NET CLI
-
+```bash
 cd src/Pokedex.API
 dotnet run
-
+```
 
 ### Executando com Docker
+```bash
 docker build -t pokedex-api .
 docker run -p 5000:80 pokedex-api
+```
 
 ### Testando a API
-http://localhost:5000/swagger/index.html
+http://localhost:5000/swagger/index.html \
+Ou o projeto publicado em Rennder\
+https://pokedex-6056.onrender.com/
 
+### Processo e desafios desenvolvimento
+O primeiro passo foi dar uma boa explorada na API do Pokémon e testei os endpoints disponíveis e entendi como funciona o fluxo de evolução e percebi que o GET direto não traz as infos de evolução, mas notei que ele retorna um link pra species, e dentro desse retorno tem a URL da cadeia de evolução. Como não encontrei nenhum vínculo direto mais simples, segui esse caminho. Também reparei que o último Pokémon listado na API é o de ID 1025.\
+Decidi como estruturar o projeto e optei por usar arquitetura limpa, DDD e princípios do SOLID pra manter tudo organizado e com boas práticas.\
+Durante o GET de 10 pokémons aleatórios, encontrei um problema: alguns JSONs eram enormes e acabavam estourando o buffer da requisição, portanto, tive que contornar isso mudando de lib e ajustando a abordagem pra garantir que tudo funcionasse.
 
 >  This is a challenge by [Coodesh](https://coodesh.com/)
