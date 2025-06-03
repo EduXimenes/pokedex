@@ -66,5 +66,3 @@ https://pokedex-6056.onrender.com/
 O primeiro passo foi dar uma boa explorada na API do Pokémon e testei os endpoints disponíveis e entendi como funciona o fluxo de evolução e percebi que o GET direto não traz as infos de evolução, mas notei que ele retorna um link pra species, e dentro desse retorno tem a URL da cadeia de evolução. Como não encontrei nenhum vínculo direto mais simples, segui esse caminho. Também reparei que o último Pokémon listado na API é o de ID 1025.\
 Decidi como estruturar o projeto e optei por usar arquitetura limpa, DDD e princípios do SOLID pra manter tudo organizado e com boas práticas.\
 Durante o GET de 10 pokémons aleatórios, encontrei um problema: alguns JSONs eram enormes e acabavam estourando o buffer da requisição, portanto, tive que contornar isso mudando de lib e ajustando a abordagem pra garantir que tudo funcionasse.
-
->  This is a challenge by [Coodesh](https://coodesh.com/)
